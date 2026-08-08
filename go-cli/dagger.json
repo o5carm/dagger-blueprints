@@ -1,0 +1,29 @@
+{
+  "name": "go-cli",
+  "engineVersion": "v0.21.7",
+  "sdk": {
+    "source": "go"
+  },
+  "dependencies": [
+    {
+      "name": "build-toolchain",
+      "source": "github.com/juli3nk/dagger-toolchains/build@11cf80299862aacf4dcafb504085cb1d80f016a2",
+      "pin": "11cf80299862aacf4dcafb504085cb1d80f016a2"
+    },
+    {
+      "name": "go-toolchain",
+      "source": "github.com/juli3nk/dagger-toolchains/go@11cf80299862aacf4dcafb504085cb1d80f016a2",
+      "pin": "11cf80299862aacf4dcafb504085cb1d80f016a2"
+    },
+    {
+      "name": "release-toolchain",
+      "source": "github.com/juli3nk/dagger-toolchains/release@11cf80299862aacf4dcafb504085cb1d80f016a2",
+      "pin": "11cf80299862aacf4dcafb504085cb1d80f016a2"
+    },
+    {
+      "name": "repository-toolchain",
+      "source": "github.com/juli3nk/dagger-toolchains/repository@11cf80299862aacf4dcafb504085cb1d80f016a2",
+      "pin": "11cf80299862aacf4dcafb504085cb1d80f016a2"
+    }
+  ]
+}
