@@ -73,7 +73,7 @@ func (m *GoCli) Build(
 	// +default=["linux/amd64","linux/arm64"]
 	platforms []string,
 ) *dagger.Directory {
-	return dag.BuildToolchain(m.GoVersion, m.Source).Build(name, packages, dagger.BuildToolchainBuildOpts{
+	return dag.GoToolchain(m.GoVersion, m.Source).BuildMulti(name, packages, dagger.GoToolchainBuildMultiOpts{
 		Platforms: platforms,
 	})
 }
@@ -92,7 +92,7 @@ func (m *GoCli) Release(
 	// +default=false
 	dryRun bool,
 ) (string, error) {
-	rt := dag.ReleaseToolchain("", "", "", "", dag.SetSecret("registry-secret", "unused"), m.GithubToken)
+	rt := dag.ReleaseToolchain(m.GithubToken)
 
 	version, err := rt.Release(ctx, m.Source, dagger.ReleaseToolchainReleaseOpts{
 		RepositoryURL: repositoryUrl,

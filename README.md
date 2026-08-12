@@ -6,15 +6,13 @@ Each blueprint takes the repository and infra configuration in its constructor, 
 
 Builds and publishes a Go microservice: `Verify` → `Build` (minimal image) → `Release` (image + SBOM + vulnerability report + GitHub release).
 
-Constructor: `New(source *Directory, goVersion, alpineVersion, registryAddress, registryNamespace, registryUsername string, registrySecret, githubToken *Secret, githubOwner, githubRepo string)`.
+Constructor: `New(source *Directory, goVersion, alpineVersion string, githubToken *Secret, githubOwner, githubRepo string)`.
 
-Full constructor flags:
+Constructor flags:
 
 ```bash
 COMMON="--source=./repo --go-version=1.22 --alpine-version=3.20 \
---registry-address=ghcr.io --registry-namespace=owner --registry-username=owner \
---registry-secret=env:REG_TOKEN --github-token=env:GH_TOKEN \
---github-owner=owner --github-repo=repo"
+--github-token=env:GH_TOKEN --github-owner=owner --github-repo=repo"
 ```
 
 Functions:
@@ -35,13 +33,15 @@ dagger call $COMMON scan --image=alpine:3.20
 # Version + publish image + attach SBOM/vuln report
 dagger call $COMMON release \
   --name=hello --main-package=. \
+  --registry-address=ghcr.io --registry-namespace=owner \
+  --registry-username=owner --registry-secret=env:REG_TOKEN \
   --repository-url=https://github.com/owner/repo --dry-run
 ```
 
 `build(name, mainPackage, entrypoint?=null, port?=0, platform?="linux/amd64")` → `*Container`.
 `sbom(image *Container, format?="spdx-json")`, `vulnerability-report(image *Container, format?="table")` → `*File`.
 `scan(ctx, image *Container)` → `string`.
-`release(ctx, name, mainPackage string, repositoryUrl?="", dryRun?=false)` → `string`. With `dryRun=true`, semantic-release runs but **publish and asset upload are skipped**.
+`release(ctx, name, mainPackage string, repositoryUrl?="", dryRun?=false, registryAddress?="", registryNamespace?="", registryUsername?="", registrySecret?=*Secret)` → `string`. With `dryRun=true`, semantic-release runs but **publish and asset upload are skipped**. Registry params are optional and only used when not in dry-run.
 
 ### go-library
 

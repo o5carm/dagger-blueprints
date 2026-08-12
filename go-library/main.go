@@ -68,7 +68,7 @@ func (m *GoLibrary) Release(
 	// +default=false
 	dryRun bool,
 ) (string, error) {
-	return dag.ReleaseToolchain("", "", "", "", dag.SetSecret("registry-secret", "unused"), m.GithubToken).Release(ctx, m.Source, dagger.ReleaseToolchainReleaseOpts{
+	return dag.ReleaseToolchain(m.GithubToken).Release(ctx, m.Source, dagger.ReleaseToolchainReleaseOpts{
 		RepositoryURL: repositoryUrl,
 		DryRun:        dryRun,
 	})

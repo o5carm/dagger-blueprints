@@ -10,16 +10,12 @@ import (
 )
 
 type GoService struct {
-	Source            *dagger.Directory
-	GoVersion         string
-	AlpineVersion     string
-	RegistryAddress   string
-	RegistryNamespace string
-	RegistryUsername  string
-	RegistrySecret    *dagger.Secret
-	GithubToken       *dagger.Secret
-	GithubOwner       string
-	GithubRepo        string
+	Source        *dagger.Directory
+	GoVersion     string
+	AlpineVersion string
+	GithubToken   *dagger.Secret
+	GithubOwner   string
+	GithubRepo    string
 }
 
 func New(
@@ -28,14 +24,6 @@ func New(
 	goVersion string,
 	// Alpine version used for the minimal rootfs
 	alpineVersion string,
-	// Registry address (e.g. "ghcr.io"). Empty disables publication.
-	registryAddress string,
-	// Registry namespace (e.g. "juli3nk")
-	registryNamespace string,
-	// Registry username
-	registryUsername string,
-	// Registry secret
-	registrySecret *dagger.Secret,
 	// GitHub token used to create releases and upload assets
 	githubToken *dagger.Secret,
 	// GitHub repository owner
@@ -44,16 +32,12 @@ func New(
 	githubRepo string,
 ) *GoService {
 	return &GoService{
-		Source:            source,
-		GoVersion:         goVersion,
-		AlpineVersion:     alpineVersion,
-		RegistryAddress:   registryAddress,
-		RegistryNamespace: registryNamespace,
-		RegistryUsername:  registryUsername,
-		RegistrySecret:    registrySecret,
-		GithubToken:       githubToken,
-		GithubOwner:       githubOwner,
-		GithubRepo:        githubRepo,
+		Source:        source,
+		GoVersion:     goVersion,
+		AlpineVersion: alpineVersion,
+		GithubToken:   githubToken,
+		GithubOwner:   githubOwner,
+		GithubRepo:    githubRepo,
 	}
 }
 
@@ -154,8 +138,20 @@ func (m *GoService) Release(
 	// +optional
 	// +default=false
 	dryRun bool,
+	// Registry address (e.g. "ghcr.io"). Empty disables publication.
+	// +optional
+	registryAddress string,
+	// Registry namespace (e.g. "juli3nk")
+	// +optional
+	registryNamespace string,
+	// Registry username
+	// +optional
+	registryUsername string,
+	// Registry secret
+	// +optional
+	registrySecret *dagger.Secret,
 ) (string, error) {
-	rt := dag.ReleaseToolchain(name, m.RegistryAddress, m.RegistryNamespace, m.RegistryUsername, m.RegistrySecret, m.GithubToken)
+	rt := dag.ReleaseToolchain(m.GithubToken)
 
 	version, err := rt.Release(ctx, m.Source, dagger.ReleaseToolchainReleaseOpts{
 		RepositoryURL: repositoryUrl,
@@ -172,7 +168,12 @@ func (m *GoService) Release(
 	image := m.Build(name, mainPackage, nil, 0, "")
 
 	if _, err := rt.Publish(ctx, image, version, dagger.ReleaseToolchainPublishOpts{
-		Latest: true,
+		ImageName:         name,
+		RegistryAddress:   registryAddress,
+		RegistryNamespace: registryNamespace,
+		RegistryUsername:  registryUsername,
+		RegistrySecret:    registrySecret,
+		Latest:            true,
 	}); err != nil {
 		return "", err
 	}
